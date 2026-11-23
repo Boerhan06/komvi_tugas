@@ -92,6 +92,11 @@ $$\text{Error (\%)} = \frac{|Z_{\text{est}} - Z_{\text{true}}|}{Z_{\text{true}}}
 ### Flowchart 1: Proses Kalibrasi Kamera
 Diagram alir proses kalibrasi kamera menggunakan papan catur beserta penanganan kondisi gagal:
 
+![Flowchart Kalibrasi Kamera](diagram/flowchart_kalibrasi.png)
+
+<details>
+<summary><b>Klik untuk melihat kode Mermaid Flowchart 1</b></summary>
+
 ```mermaid
 flowchart TD
     Start(["Mulai Kalibrasi Kamera"]) --> InputData["Siapkan 15-25 Foto Chessboard (cal_xx.jpg)<br/>Definisikan PATTERN_SIZE (9,6) & SQUARE_SIZE_MM"]
@@ -116,11 +121,17 @@ flowchart TD
     ExtractParam --> SaveParam["Simpan Parameter Kalibrasi ke File / Memori"]
     SaveParam --> EndSuccess(["Selesai (Kalibrasi Berhasil)"])
 ```
+</details>
 
 ---
 
 ### Flowchart 2: Estimasi Depth Stereo Vision
 Diagram alir proses pengolahan stereo vision dari sepasang citra hingga evaluasi galat:
+
+![Flowchart Stereo Depth Estimation](diagram/flowchart_stereo_depth.png)
+
+<details>
+<summary><b>Klik untuk melihat kode Mermaid Flowchart 2</b></summary>
 
 ```mermaid
 flowchart TD
@@ -148,6 +159,7 @@ flowchart TD
     CalcError --> SaveCSV["Tampilkan Visualisasi & Simpan Log ke CSV"]
     SaveCSV --> EndSuccess(["Selesai (Sukses)"])
 ```
+</details>
 
 ---
 
@@ -163,6 +175,13 @@ flowchart TD
    ├── stereo/
    │   ├── left.jpg
    │   └── right.jpg
+   ├── diagram/
+   │   ├── flowchart_kalibrasi.png
+   │   └── flowchart_stereo_depth.png
+   ├── output/                  # Dibuat otomatis oleh notebook
+   ├── Starter_Stereo_1HP.ipynb # Notebook utama praktikum
+   └── README.md                # Laporan praktikum ini
+   ```
    ├── output/                  # Dibuat otomatis oleh notebook
    ├── Starter_Stereo_1HP.ipynb # Notebook utama praktikum
    └── README.md                # Laporan praktikum ini

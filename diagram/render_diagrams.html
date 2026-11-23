@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagram Alir Stereo Vision</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #ffffff;
+      padding: 40px;
+      margin: 0;
+    }
+    .diagram-container {
+      background: #ffffff;
+      border: 1px solid #e1e4e8;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 50px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #1f2937;
+      margin-top: 0;
+      margin-bottom: 25px;
+      font-size: 22px;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="diagram-container" id="container-kalibrasi">
+    <h2>Flowchart 1: Pipeline Kalibrasi Kamera Chessboard</h2>
+    <div class="mermaid" id="diagram1">
+flowchart TD
+    Start(["Mulai Kalibrasi Kamera"]) --> InputData["Siapkan 15-25 Foto Chessboard (cal_xx.jpg)<br>Definisikan PATTERN_SIZE (9,6) dan SQUARE_SIZE_MM"]
+    InputData --> LoopFoto["Iterasi Setiap Foto Chessboard"]
+    LoopFoto --> GrayConv["Konversi Foto ke Grayscale"]
+    GrayConv --> DetectCorner["Deteksi Sudut Dalam:<br>cv2.findChessboardCorners()"]
+    
+    DetectCorner --> CheckDetect{"Sudut Terdeteksi Lengkap?<br>(9 x 6 = 54 titik)"}
+    CheckDetect -- Tidak --> LogFail["Tandai Foto Gagal / Abaikan Foto"]
+    CheckDetect -- Ya --> SubPix["Perhalus Koordinat:<br>cv2.cornerSubPix()"]
+    SubPix --> AppendPoints["Simpan 3D Object Points dan 2D Image Points"]
+    
+    LogFail --> CheckNext{"Masih Ada Foto Lain?"}
+    AppendPoints --> CheckNext
+    CheckNext -- Ya --> LoopFoto
+    CheckNext -- Tidak --> CheckValidCount{"Jumlah Foto Valid >= 10?"}
+    
+    CheckValidCount -- Tidak --> ErrorCalib["PERINGATAN: Data Kurang Tajam / Kurang Sudut.<br>Ulangi Pengambilan Foto Kalibrasi!"] --> EndFail(["Selesai (Gagal)"])
+    CheckValidCount -- Ya --> RunCalib["Jalankan cv2.calibrateCamera()"]
+    
+    RunCalib --> ExtractParam["Ekstraksi Parameter Kamera:<br>fx, fy, cx, cy, Koefisien Distorsi, RMS Error"]
+    ExtractParam --> SaveParam["Simpan Parameter Kalibrasi ke File / Memori"]
+    SaveParam --> EndSuccess(["Selesai (Kalibrasi Berhasil)"])
+    </div>
+  </div>
+
+  <div class="diagram-container" id="container-stereo">
+    <h2>Flowchart 2: Pipeline Estimasi Depth Stereo Vision</h2>
+    <div class="mermaid" id="diagram2">
+flowchart TD
+    Start(["Mulai Stereo Depth Estimation"]) --> ReadImages["Baca Foto Kiri (left.jpg) dan Kanan (right.jpg)<br>Input Parameter: fx, cx, cy, Baseline B, Z_true"]
+    ReadImages --> Undistort["Koreksi Distorsi Lensa:<br>cv2.undistort() pada Citra L dan R"]
+    Undistort --> FeatureMatch["Deteksi dan Pencocokan Fitur (ORB / SIFT)<br>Hitung Selisih Garis Vertikal (dy)"]
+    
+    FeatureMatch --> CheckAlignment{"Median |dy| <= Batas Toleransi?<br>(Epipolar Alignment Valid?)"}
+    CheckAlignment -- Tidak --> AutoCorrect["Coba Koreksi Geometris / Homografi Tipis"]
+    AutoCorrect --> Recheck{"Alignment Berhasil Membaik?"}
+    Recheck -- Tidak --> ErrorAlign["GAGAL ALIGNMENT:<br>Foto Terlalu Miring / Rotasi Terlalu Besar.<br>Ambil Ulang Foto Stereo!"] --> EndFail(["Selesai (Gagal)"])
+    
+    CheckAlignment -- Ya --> DisparityCompute["Hitung Disparity Map:<br>cv2.StereoSGBM_create()"]
+    Recheck -- Ya --> DisparityCompute
+    
+    DisparityCompute --> CheckDisp{"Disparity Positif dan Valid > 70%?"}
+    CheckDisp -- Tidak --> SwapCheck{"Apakah Foto Kiri/Kanan Terbalik?"}
+    SwapCheck -- Ya --> SwapImages["Tukar Citra L dan R"] --> DisparityCompute
+    SwapCheck -- Tidak --> ErrorDisp["GAGAL: Area Terlalu Polos / Baseline Rusak"] --> EndFail
+    
+    CheckDisp -- Ya --> ComputeDepth["Hitung Depth Map Pixel-wise:<br>Z = (fx * B) / d"]
+    ComputeDepth --> SelectROI["Tentukan Bounding Box / Titik ROI Objek Target"]
+    SelectROI --> CalcMedianDepth["Ambil Median Disparity dan Median Depth pada ROI:<br>Z_est"]
+    CalcMedianDepth --> CalcError["Hitung Galat Terhadap Meteran:<br>Error (%) = |Z_est - Z_true| / Z_true * 100"]
+    CalcError --> SaveCSV["Tampilkan Visualisasi dan Simpan Log ke CSV"]
+    SaveCSV --> EndSuccess(["Selesai (Sukses)"])
+    </div>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#e0f2fe',
+        primaryTextColor: '#0369a1',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#64748b',
+        secondaryColor: '#fef3c7',
+        tertiaryColor: '#f1f5f9',
+        fontSize: '15px'
+      }
+    });
+  </script>
+</body>
+</html>
