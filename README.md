@@ -45,14 +45,14 @@ $$\text{Error (\%)} = \frac{|Z_{\text{est}} - Z_{\text{true}}|}{Z_{\text{true}}}
 
 ### Tabel Pengukuran 3 Jarak
 
-| Uji | Jarak Meteran $Z_{\text{true}}$ (m) | Baseline $B$ (cm) | $f_x$ (px) | Disparity ROI $d$ (px) | Depth Estimasi $Z_{\text{est}}$ (m) | Error (%) | Keterangan / Status |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **1** | **0.40** | 10.0 | 1010.25 | 252.00 | 0.4009 | **0.22%** | *Sangat Akurat (Validitas piksel: 95.6%)* |
-| **2** | **1.00** | 10.0 | 1010.25 | *(isi saat uji 2)* | *(isi saat uji 2)* | *(isi saat uji 2)* | *Target pengujian kedua* |
-| **3** | **1.50** | 10.0 | 1010.25 | *(isi saat uji 3)* | *(isi saat uji 3)* | *(isi saat uji 3)* | *Target pengujian ketiga* |
+| Uji | Jarak Meteran {\\text{true}}$ (m) | Baseline $ (cm) | $ (px) | Median $ (px) | Disparity ROI $ (px) | Depth Estimasi {\\text{est}}$ (m) | Error (%) | Keterangan / Objek |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---|
+| **1** | **0.40** | 10.0 | 1010.25 | 0.56 | 252.00 | 0.4009 | **0.22%** | *Objek Uji 1 (Validitas: 95.6%)* |
+| **2** | **0.40** | 10.0 | 1010.25 | 1.51 | 255.00 | 0.3962 | **0.96%** | *Gelas Hijau Posisi 1 (Validitas: 97.7%)* |
+| **3** | **0.50** | 10.0 | 1010.25 | 0.53 | 204.44 | 0.4942 | **1.17%** | *Gelas Hijau Posisi 2 (Validitas: 99.0%)* |
 
-> **Catatan Uji 1:**  
-> Pada pengujian pertama ($Z = 0.40\text{ m}$), median selisih vertikal sebelum koreksi adalah $|\Delta y| = 1.44\text{ px}$, dan setelah autokoreksi vertikal turun menjadi $0.56\text{ px}$ dengan inlier matching $162/185$ titik dan disparity positif mencapai $99.4\%$. Hasil estimasi $0.4009\text{ m}$ memberikan tingkat akurasi tinggi dengan error hanya $0.22\%$.
+> **Catatan Analisis Hasil Pengukuran Tiga Jarak:**  
+> Seluruh pengujian menghasilkan galat yang sangat kecil ($\\le 1.17\\%$). Nilai disparity terbukti berbanding terbalik secara konsisten terhadap jarak kedalaman: saat objek berada di .40\\text{ m}$, disparity berkisar  - 255\\text{ px}$; ketika objek dimundurkan ke .50\\text{ m}$, disparity turun secara teratur menjadi .44\\text{ px}$, menghasilkan estimasi kedalaman yang sangat presisi (.4942\\text{ m}$).
 
 ---
 
